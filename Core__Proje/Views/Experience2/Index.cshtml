@@ -1,0 +1,137 @@
+﻿@using EntityLayer.Concreate
+@model List<Experience>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_NewAdminLayout.cshtml";
+}
+
+
+
+
+<div class="col-md-6">
+    <div class="p-2">
+        <button type="button" id="btnGetListAll" class="btn btn-outline-primary">Verileri Getir</button>
+        <button type="button" id="btnAdd" class="btn btn-outline-info">Kaydet</button>
+        <button type="button" id="btnId" class="btn btn-outline-success">Id'ye göre getir</button>
+        <button type="button" id="btnDelete" class="btn btn-outline-warning">Sil</button>
+        <button type="button" id="btnUpdate" class="btn btn-outline-success">Güncelle</button>
+    </div>
+</div>
+
+<h4 class="text-center">Deneyim Listesi</h4>
+<div class="pd-2" id="listExperience">
+    buraya veriler gelicek
+</div>
+
+<br />
+
+<div class="pd-2" id="listByIdExperience">
+    buraya veriler gelicek
+</div>
+
+<br />
+
+<div class="col-md-12">
+    <h4>Ekleme Paneli</h4>
+    <input type="text" class="form-control" id="inpName" placeholder="Ad" />
+    <br />
+    <input type="text" class="form-control" id="inpSurName" placeholder="Soyad" />
+</div>
+<br />
+<div class="col-md-12">
+    <h4>Id'ye Göre Getirme Paneli</h4>
+    <input type="text" class="form-control" id="inpId" placeholder="İd'yi giriniz" />
+
+</div>
+<br />
+<div class="col-md-12">
+    <h4>Silme Paneli</h4>
+    <input type="text" class="form-control" id="inDelId" placeholder="İd'yi giriniz" />
+
+</div>
+
+@section Scripts
+{
+    <script>
+        $("#btnGetListAll").click(function () {
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: "Get",
+                url: "/Experience2/ListExperience/",
+
+                success: function (func) {
+                    let values = jQuery.parseJSON(func);
+                    console.log(values);
+
+                    let htmlst = '<table class=table table bordered> <tr> <th>Id</th> <th> Başlık </th> <th> Tarih </th>                         </tr>'
+                    $.each(values, (index, value) => {
+                        htmlst += `<tr> <td>${value.ExperinceId}</td> <td>${value.Name}</td>
+                                        <td>${value.Date}</td> </tr>`
+                    });
+
+                    htmlst += "</table>";
+                    $("#listExperience").html(htmlst);
+                }
+            });
+        });
+
+        $("#btnAdd").click(function () {
+            let values = {
+                Name: $("inpname").val(),
+                Date: $("inpDate").val()
+            };
+
+            $.ajax({
+                type: "Post",
+                url: "/Experience2/AddExperience/",
+                data: values,
+                success: function (funk1) {
+                    let result = jQuery.parseJSON(funk1);
+                    alert(result.Name + "Başarılı bir şekilde eklenmiştir");
+                }
+            });
+        });
+
+        $("#btnId").click(x => {
+            let id = $("#inpId").val();
+
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: "Get",
+                url: "/Experience2/GetByID/",
+                data: { ExperienceID: id },
+                success: function (funk2) {
+                    let result = jQuery.parseJSON(funk2);
+                    console.log(result);
+                    let htmlstr = `<table class=table table-hover> <tr> <th>Deneyim Id</th> <td> ${result.ExperienceID}</td> </tr>
+                                        <tr> <th> Deneyim Başlığı </th> <td> ${result.Name}</td> <table>`;
+                    $("#listByIdExperience").html(htmlstr);
+                   
+                }
+            });
+
+            
+        });
+
+        $("#btnDelete").click(x => {
+            let id = $("#inDelId").val();
+
+            $.ajax({
+                url:"/Experience2/DeleteExperience/"+id,
+                type:"Post",
+                contentType:"application/json",
+                dataType:"json",
+                success: function (funk3) {
+                    loadData();
+                }
+            })
+        })
+    </script>
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+
